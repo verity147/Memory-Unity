@@ -40,6 +40,8 @@ public class CardManager : MonoBehaviour
     private void Start()
     {
         InstantiateCards();
+        Shuffle();
+        LayoutCards();
     }
 
     private void Update()
@@ -58,7 +60,6 @@ public class CardManager : MonoBehaviour
                 hitObject.GetComponent<Card>().Turn();
             }
         }
-
     }
 
     private void InstantiateCards()
@@ -78,9 +79,20 @@ public class CardManager : MonoBehaviour
                 cardsIndexHelper++;
             }
         }
-        LayoutCards();
     }
-                               
+
+    public void Shuffle()
+    {
+        GameObject temp;
+        for (int i = 0; i < cards.Length - 1; i++)
+        {
+            int rnd = UnityEngine.Random.Range(i, cards.Length);
+            temp = cards[rnd];
+            cards[rnd] = cards[i];
+            cards[i] = temp;
+        }
+    }
+
     private void LayoutCards()
     {
         //height and width need to account for margins
