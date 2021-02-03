@@ -99,25 +99,29 @@ public class CardManager : MonoBehaviour
 
     private void LayoutCards()
     {
-        //height and width need to account for margins
         Vector2 cardSize = cards[0].GetComponent<SpriteRenderer>().sprite.bounds.size;
-        Vector2 effectiveSpace = new Vector2(cameraSize.x - 2 * cardSize.x * cardMargin, cameraSize.y - 2 * cardSize.y * cardMargin);
-        print(effectiveSpace);
+        Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x - 2 * cardSize.x * cardMargin, screenSizeWorld.y - 2 * cardSize.y * cardMargin);
+
+
+        float cardSpace = (cards.Length * (cardSize.x + cardSize.x * cardMargin))* (cardSize.y + cardSize.y * cardMargin);
+        float cardSizeFactor = effectiveSpace.x * effectiveSpace.y / cardSpace;
+        Vector2 cardSizeScaled = new Vector2(cardSize.x * cardSizeFactor, cardSize.y * cardSizeFactor);
         Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
-        print(cardStartPos);
-        cardStartPos += new Vector2(cardSize.x * cardMargin * 2, -(cardSize.y * cardMargin * 2));
-        print(cardStartPos);
+        cardStartPos += new Vector2(cardSizeScaled.x * cardMargin * 2 + cardSizeScaled.x / 2, 
+                                    -(cardSizeScaled.y * cardMargin * 2 + cardSizeScaled.y / 2));
         Vector2 nextCardPos = cardStartPos;
 
 
         // 1)check for appropriate card size, 2)scale them, 3)lay them out
         foreach (GameObject card in cards)
         {
+            card.transform.localScale = cardSizeScaled;
             card.transform.position = nextCardPos;
-            nextCardPos += new Vector2(cardSize.x + cardSize.x * cardMargin, 0f);
+            nextCardPos += new Vector2(cardSizeScaled.x + cardSizeScaled.x * cardMargin, 0f);
             if (nextCardPos.x > mainCamera.ScreenToWorldPoint(new Vector3(cameraWidth,cameraHeight,0f)).x)
             {
-                nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - cardSize.y + cardSize.y * cardMargin);
+                nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardSizeScaled.y * cardMargin));
             }
 
         }
@@ -126,6 +130,8 @@ public class CardManager : MonoBehaviour
         int cardsX = Mathf.FloorToInt(effectiveSpace.x / cardSize.x);
         int cardsY = Mathf.FloorToInt(effectiveSpace.y / cardSize.y);
         int rest = cards.Length % (cardsY * cardsX);
+
+            
         if (rest == 0)
         {
             //proceed, check if cards could be larger
