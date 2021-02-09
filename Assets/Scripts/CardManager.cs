@@ -100,30 +100,29 @@ public class CardManager : MonoBehaviour
     private void LayoutCards()
     {
         Vector2 cardSize = cards[0].GetComponent<SpriteRenderer>().sprite.bounds.size;
-        Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+        Vector2 screenSizeWorld = new Vector2(mainCamera.aspect * mainCamera.orthographicSize * 2, mainCamera.orthographicSize * 2);
         print(screenSizeWorld);
+
         Vector2 effectiveSpace = new Vector2(screenSizeWorld.x - 2 * cardMargin, screenSizeWorld.y - 2 * cardMargin);
         print(effectiveSpace);
+        //float cardSpace = cards.Length * ((cardSize.x + cardMargin)* (cardSize.y + cardMargin));
+        //print(cardSpace);
 
-        float cardSpace = cards.Length * ((cardSize.x + cardMargin)* (cardSize.y + cardMargin));
-        print(cardSpace);
+        //float cardSizeFactor = (effectiveSpace.x * effectiveSpace.y / cardSpace);
+        //print(cardSizeFactor);
+        ////float cardSizeFactor = 3.91f;
+        //Vector2 cardSizeScaled = new Vector2(cardSize.x * cardSizeFactor - cardMargin, cardSize.y * cardSizeFactor - cardMargin);
 
-        float cardSizeFactor = (effectiveSpace.x * effectiveSpace.y / cardSpace);
-        print(cardSizeFactor);
-
-        Vector2 cardSizeScaled = new Vector2(cardSize.x * cardSizeFactor - cardMargin, cardSize.y * cardSizeFactor - cardMargin);
-
+        Vector2 cardSizeScaled = ScaleCards(cardSize, effectiveSpace);
         Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
         cardStartPos += new Vector2(cardMargin * 2 + cardSizeScaled.x / 2, 
                                     -(cardMargin * 2 + cardSizeScaled.y / 2));
         Vector2 nextCardPos = cardStartPos;
 
-
-        // 1)check for appropriate card size, 2)scale them, 3)lay them out
         foreach (GameObject card in cards)
         {
             card.transform.localScale = cardSizeScaled;
-            if (nextCardPos.x + cardSizeScaled.x/2 + cardMargin/2 > effectiveSpace.x)
+            if (nextCardPos.x + cardSizeScaled.x/2 + cardMargin/2 > mainCamera.ScreenToWorldPoint(new Vector3(cameraWidth, cameraHeight, 0f)).x)//right edge of camera
             {
                 nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
                 card.transform.position = nextCardPos;
@@ -135,26 +134,35 @@ public class CardManager : MonoBehaviour
                 nextCardPos += new Vector2(cardSizeScaled.x + cardMargin, 0f);
             }
         }
-
-
-        int cardsX = Mathf.FloorToInt(effectiveSpace.x / cardSize.x);
-        int cardsY = Mathf.FloorToInt(effectiveSpace.y / cardSize.y);
-        int rest = cards.Length % (cardsY * cardsX);
-
-            
-        if (rest == 0)
-        {
-            //proceed, check if cards could be larger
-        }
-        else if(rest < cardsX)
-        {
-            //just one line of cards more than space
-            cardsY++;
-        }
-        else if(rest > cardsX)
-        {
-            //more than one row too many
-        }
     }
 
+    private Vector2 ScaleCards(Vector2 cardSize, Vector2 effectiveSpace)
+    {
+        int amountCardsX = Mathf.FloorToInt(effectiveSpace.x / cardSize.x + cardMargin);
+        int amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX); 
+        Vector2 cardSizeScaled = cardSize;
+
+        //repeat until last else if is fulfilled, then return
+        if (amountCardsY * (cardSizeScaled.y + cardMargin) > effectiveSpace.y)
+        {
+            //cardsize down so amountCardsX is +1
+            amountCardsX++;
+            amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
+            cardSizeScaled = new Vector2(effectiveSpace.x / (amountCardsX) * (cardSizeScaled.x + cardMargin), cardSizeScaled.x);
+        }
+        else if (effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) > cardSizeScaled.y + cardMargin)
+        {
+            //cardsize up so amountcardsx is -1
+            amountCardsX--;
+            amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
+            cardSizeScaled = new Vector2(effectiveSpace.x / (amountCardsX) * (cardSizeScaled.x + cardMargin), cardSizeScaled.x);
+        }
+        else if (effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) < cardSizeScaled.y + cardMargin)
+        {
+            //correct size, remove margins for actual card only size
+            cardSizeScaled = new Vector2(cardSizeScaled.x - cardMargin, cardSizeScaled.y);
+        }
+
+        return cardSizeScaled;
+    }
 }
