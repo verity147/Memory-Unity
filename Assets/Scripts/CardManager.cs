@@ -12,6 +12,9 @@ public class CardManager : MonoBehaviour
     private readonly float cardMargin = .2f; 
     public GameObject[] cards;
     private Vector2 cameraSize;
+    private Vector2 cardSizeScaled;
+    private int amountCardsX;
+    private int amountCardsY;
 
     public Sprite[] cardpictures;
 
@@ -55,7 +58,7 @@ public class CardManager : MonoBehaviour
         if (hit.collider != null)
         {
             GameObject hitObject = hit.collider.gameObject;
-            Debug.Log(hit.collider.gameObject.name);
+            //Debug.Log(hit.collider.gameObject.name);
             //do hover animation
             if (turnCardAction.triggered && hitObject.GetComponent<Card>())
             {
@@ -100,69 +103,73 @@ public class CardManager : MonoBehaviour
     private void LayoutCards()
     {
         Vector2 cardSize = cards[0].GetComponent<SpriteRenderer>().sprite.bounds.size;
-        Vector2 screenSizeWorld = new Vector2(mainCamera.aspect * mainCamera.orthographicSize * 2, mainCamera.orthographicSize * 2);
-        print(screenSizeWorld);
+        Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(mainCamera.pixelWidth, mainCamera.pixelHeight));
+        print("SSW: " + screenSizeWorld);
 
-        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x - 2 * cardMargin, screenSizeWorld.y - 2 * cardMargin);
+        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x*2 - 2 * cardMargin, screenSizeWorld.y*2 - 2 * cardMargin);
         print(effectiveSpace);
-        //float cardSpace = cards.Length * ((cardSize.x + cardMargin)* (cardSize.y + cardMargin));
-        //print(cardSpace);
 
-        //float cardSizeFactor = (effectiveSpace.x * effectiveSpace.y / cardSpace);
-        //print(cardSizeFactor);
-        ////float cardSizeFactor = 3.91f;
-        //Vector2 cardSizeScaled = new Vector2(cardSize.x * cardSizeFactor - cardMargin, cardSize.y * cardSizeFactor - cardMargin);
-
-        Vector2 cardSizeScaled = ScaleCards(cardSize, effectiveSpace);
+        cardSizeScaled = ScaleCards(cardSize, effectiveSpace);
         Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
-        cardStartPos += new Vector2(cardMargin * 2 + cardSizeScaled.x / 2, 
-                                    -(cardMargin * 2 + cardSizeScaled.y / 2));
+
+        float leftRightMargin = screenSizeWorld.x * 2 - amountCardsX * (cardSizeScaled.x + cardMargin) + cardMargin * 2;
+        float topBotMargin = screenSizeWorld.y * 2 - amountCardsY * (cardSizeScaled.y + cardMargin) + cardMargin * 2;
+
+        cardStartPos += new Vector2(cardSizeScaled.x / 2 + leftRightMargin / 2, -(cardSizeScaled.y / 2 + topBotMargin / 2));
         Vector2 nextCardPos = cardStartPos;
 
-        foreach (GameObject card in cards)
+        int cardCounter = 0;
+        for (int i = 0; i < amountCardsY; i++)
         {
-            card.transform.localScale = cardSizeScaled;
-            if (nextCardPos.x + cardSizeScaled.x/2 + cardMargin/2 > mainCamera.ScreenToWorldPoint(new Vector3(cameraWidth, cameraHeight, 0f)).x)//right edge of camera
+            for (int j = 0; j < amountCardsX; j++)
             {
-                nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
-                card.transform.position = nextCardPos;
-
-            }
-            else
-            {
-                card.transform.position = nextCardPos;
+                if (cardCounter > cards.Length - 1)
+                    return;
+                cards[cardCounter].transform.localScale = cardSizeScaled;
+                cards[cardCounter].transform.position = nextCardPos;
                 nextCardPos += new Vector2(cardSizeScaled.x + cardMargin, 0f);
+                cardCounter++;
             }
+            if (cardCounter > cards.Length - 1)
+                return;
+            nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
+            cards[cardCounter].transform.localScale = cardSizeScaled;
+            cards[cardCounter].transform.position = nextCardPos;
+            cardCounter++;
         }
     }
 
     private Vector2 ScaleCards(Vector2 cardSize, Vector2 effectiveSpace)
     {
-        int amountCardsX = Mathf.FloorToInt(effectiveSpace.x / cardSize.x + cardMargin);
-        int amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX); 
-        Vector2 cardSizeScaled = cardSize;
+        amountCards = cards.Length;
+        amountCardsX = Mathf.FloorToInt(effectiveSpace.x / (cardSize.x + cardMargin));
+        amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
+        int stop = 0;
 
-        //repeat until last else if is fulfilled, then return
-        if (amountCardsY * (cardSizeScaled.y + cardMargin) > effectiveSpace.y)
+        while ((effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) > cardSizeScaled.y + cardMargin || 
+               effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) < 0) && stop < 500)
         {
-            //cardsize down so amountCardsX is +1
-            amountCardsX++;
+            if (amountCardsY * (cardSizeScaled.y + cardMargin) > effectiveSpace.y)
+            {
+                print("too large");
+                amountCardsX++;
+            }
+            else if (effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) > cardSizeScaled.y + cardMargin)
+            {
+                print("too small");
+                amountCardsX--;
+            }
             amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
-            cardSizeScaled = new Vector2(effectiveSpace.x / (amountCardsX) * (cardSizeScaled.x + cardMargin), cardSizeScaled.x);
+            float size = effectiveSpace.x / amountCardsX - cardMargin;
+            cardSizeScaled = new Vector2(size, size);
+            stop++;
         }
-        else if (effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) > cardSizeScaled.y + cardMargin)
-        {
-            //cardsize up so amountcardsx is -1
-            amountCardsX--;
-            amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
-            cardSizeScaled = new Vector2(effectiveSpace.x / (amountCardsX) * (cardSizeScaled.x + cardMargin), cardSizeScaled.x);
-        }
-        else if (effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) < cardSizeScaled.y + cardMargin)
-        {
+
             //correct size, remove margins for actual card only size
-            cardSizeScaled = new Vector2(cardSizeScaled.x - cardMargin, cardSizeScaled.y);
-        }
+            cardSizeScaled = new Vector2(cardSizeScaled.x - cardMargin, cardSizeScaled.y - cardMargin);
+            print("size correct");
 
         return cardSizeScaled;
     }
+
 }
