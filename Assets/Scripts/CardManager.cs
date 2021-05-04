@@ -11,10 +11,13 @@ public class CardManager : MonoBehaviour
     private int cameraWidth;
     private readonly float cardMargin = .2f; 
     public GameObject[] cards;
-    private Vector2 cameraSize;
     private Vector2 cardSizeScaled;
     private int amountCardsX;
     private int amountCardsY;
+    private int turnedCards = 0;
+    private Card card1;
+    private Card card2;
+    private int cardPairsLeft = 0;
 
     public Sprite[] cardpictures;
 
@@ -41,7 +44,6 @@ public class CardManager : MonoBehaviour
         mainCamera = Camera.main;
         cameraHeight = mainCamera.pixelHeight;
         cameraWidth = mainCamera.pixelWidth;
-        cameraSize = new Vector2(mainCamera.orthographicSize * 2 * mainCamera.aspect, mainCamera.orthographicSize * 2);
     }
 
     private void Start()
@@ -50,28 +52,76 @@ public class CardManager : MonoBehaviour
         Shuffle();
         LayoutCards();
     }
-
+    /// <summary>
+    /// shouldn't the selectcardaction control whether the mouse hovers over a card?
+    /// </summary>
     private void Update()
     {
         Ray ray = mainCamera.ScreenPointToRay(selectCardAction.ReadValue<Vector2>());
         RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
+
         if (hit.collider != null)
         {
-            GameObject hitObject = hit.collider.gameObject;
-            //Debug.Log(hit.collider.gameObject.name);
-            //do hover animation
-            if (turnCardAction.triggered && hitObject.GetComponent<Card>())
+            if (hit.collider.gameObject.GetComponent<Card>())
             {
-                //check for card, stop hover animation                
-                Debug.Log(hit.collider.gameObject.name + " turned");
-                hitObject.GetComponent<Card>().Turn();
+                Card card = hit.collider.gameObject.GetComponent<Card>();
+                if (turnCardAction.triggered)
+                {
+
+                    Debug.Log(hit.collider.gameObject.name + " turned");
+                    card.Turn();
+                    turnedCards++;
+                    switch (turnedCards)
+                    {
+                        case 1:
+                            card1 = card;
+                            break;
+                        case 2:
+                            card2 = card;
+                            StartCoroutine(CompareCards());
+                            turnedCards = 0;
+                            break;
+                        default:
+                            Debug.LogWarning("Something went wrong, we shouldn't be here when no card has been turned");
+                            break;
+                    }
+                }
             }
         }
     }
 
+    private IEnumerator CompareCards()
+    {
+        turnCardAction.Disable();
+        yield return new WaitForSeconds(1.5f);
+        if (card1.pair == card2.pair)
+        {
+            ///correct
+            print("correct");
+            card1.gameObject.SetActive(false);
+            card2.gameObject.SetActive(false);
+            cardPairsLeft--;
+            if (cardPairsLeft <= 0)
+            {
+                ///end of game
+            }
+        }
+        else
+        {
+            ///wrong
+            print("wrong");
+            card1.Turn();
+            card2.Turn();
+        }
+        turnCardAction.Enable();
+    }
+
+
+
     private void InstantiateCards()
     {
         cards = new GameObject[cardpictures.Length * 2];
+        cardPairsLeft = cardpictures.Length;
         int cardsIndexHelper = 0;
         for (int i = 0; i < cardpictures.Length; i++)
         {
@@ -103,7 +153,7 @@ public class CardManager : MonoBehaviour
     private void LayoutCards()
     {
         Vector2 cardSize = cards[0].GetComponent<SpriteRenderer>().sprite.bounds.size;
-        Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(mainCamera.pixelWidth, mainCamera.pixelHeight));
+        Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
         print("SSW: " + screenSizeWorld);
 
         Vector2 effectiveSpace = new Vector2(screenSizeWorld.x*2 - 2 * cardMargin, screenSizeWorld.y*2 - 2 * cardMargin);
@@ -121,7 +171,7 @@ public class CardManager : MonoBehaviour
         int cardCounter = 0;
         for (int i = 0; i < amountCardsY; i++)
         {
-            for (int j = 0; j < amountCardsX; j++)
+            for (int j = 0; j < amountCardsX; j++)//has to start at x + 1 from second row onward
             {
                 if (cardCounter > cards.Length - 1)
                     return;
@@ -132,7 +182,7 @@ public class CardManager : MonoBehaviour
             }
             if (cardCounter > cards.Length - 1)
                 return;
-            nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
+            nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin)); //BUG leftmost cards from second row on are put twice in the same spot
             cards[cardCounter].transform.localScale = cardSizeScaled;
             cards[cardCounter].transform.position = nextCardPos;
             cardCounter++;
