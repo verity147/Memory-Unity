@@ -186,55 +186,22 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   cardpictures:
-  - {fileID: 21300000, guid: f8ac46acbfe061c4b840d48e497332fc, type: 3}
-  - {fileID: 21300000, guid: b2e56107677fd6542b2aa8c86993eaba, type: 3}
-  - {fileID: 21300000, guid: 33e61b667189b10408cfe97a602c8de8, type: 3}
-  - {fileID: 21300000, guid: 293728e8304e0054d8884c737d823756, type: 3}
-  - {fileID: 21300000, guid: dfbc62134d6637c45981038b34e82bc1, type: 3}
-  - {fileID: 21300000, guid: a7db8c8480e6e1e45af330c0151ded96, type: 3}
-  - {fileID: 21300000, guid: 2224bd54c4a357447be65a48058ceaa5, type: 3}
-  - {fileID: 21300000, guid: e15188caafc54be43b87afa6bf184868, type: 3}
-  - {fileID: 21300000, guid: 1332ea4591fd90e498dbcda13733897d, type: 3}
-  - {fileID: 21300000, guid: 5db83ce3e7c0587409827dcaf79f585f, type: 3}
-  - {fileID: 21300000, guid: f8e6dc00ae6063f4493f372607714729, type: 3}
-  - {fileID: 21300000, guid: 46a8cbbf8aea09442a118d430b401289, type: 3}
-  - {fileID: 21300000, guid: 6f8db725bdc94974dab5041b3a3675e8, type: 3}
-  - {fileID: 21300000, guid: efed25ffd94c920439560d7ca2a9fa82, type: 3}
-  - {fileID: 21300000, guid: e3b1b3440d6bac147b954816950deb06, type: 3}
-  - {fileID: 21300000, guid: a0e1db3db7bf597419a52a20c560472a, type: 3}
-  turnCardAction:
-    m_Name: Turn Card
-    m_Type: 1
-    m_ExpectedControlType: Button
-    m_Id: 82837324-078d-452e-a6c7-0110652f46b7
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 02ffcce3-64b7-455e-ba9c-68af08f10674
-      m_Path: <Mouse>/leftButton
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Turn Card
-      m_Flags: 0
-  selectCardAction:
-    m_Name: Select Card
-    m_Type: 2
-    m_ExpectedControlType: 
-    m_Id: 8abdc8b7-e53b-4546-9518-3e54bded0889
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: a8756fb5-5b6b-442f-a514-9294726a3df5
-      m_Path: <Mouse>/position
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Select Card
-      m_Flags: 0
-  amountCards: 0
+  - {fileID: 21300000, guid: 97576d8bf55caac47bf7caa9e938b5fc, type: 3}
+  - {fileID: 21300000, guid: f040d9dd97b59724bb7a8327f9831b8d, type: 3}
+  - {fileID: 21300000, guid: 37d6121b0e6ec294e80ec9dedb5952f6, type: 3}
+  - {fileID: 21300000, guid: fe96ae45ee8aca7458a46de0d035acd4, type: 3}
+  - {fileID: 21300000, guid: fb905fe4bd6acbc42aecccef291a4059, type: 3}
+  - {fileID: 21300000, guid: 2f3e392c6a7693c4bac68f9102c6101e, type: 3}
+  - {fileID: 21300000, guid: c5b8e4ec02bc1384798d6af798aee0f4, type: 3}
+  - {fileID: 21300000, guid: abb14fbf5a0c04d4cb0e58ea06a44168, type: 3}
+  - {fileID: 21300000, guid: 2de34303b9a39e6478bd34ba9772de3c, type: 3}
+  - {fileID: 21300000, guid: 2ebde4809737fe04b992f45ba4f5797c, type: 3}
+  - {fileID: 21300000, guid: 441d4b309d258d44fb921dcdaa18b95d, type: 3}
+  - {fileID: 21300000, guid: a7d93dcfefa0a6b40a5221b6e23f6327, type: 3}
+  - {fileID: 21300000, guid: 1bf4567fb19c075449394b295940d6b9, type: 3}
+  - {fileID: 21300000, guid: a7424d25a9dad0a408417c1b9dd426bc, type: 3}
+  - {fileID: 21300000, guid: 5cc6e0a8da62fc5459b7df7e6943d3f2, type: 3}
+  - {fileID: 21300000, guid: 717482d61d67eed40a0a537c2b38ed11, type: 3}
   cardPrefab: {fileID: 3313332360476557185, guid: 4bdd6b91c03b0974ba44d125bd65cfcc, type: 3}
 --- !u!4 &124769557
 Transform:

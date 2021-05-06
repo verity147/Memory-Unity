@@ -23,11 +23,15 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Card lastCard;
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
+    private int amountCards;
 
     public GameObject[] cards;
     public Sprite[] cardpictures;
-    public int amountCards;
     public GameObject cardPrefab;
+
+    /// <summary>
+    /// The card sizing logic only works with sprites that have pixels per unit 1:1 with their resolution
+    /// </summary>
 
     private void OnEnable()
     {
@@ -136,13 +140,14 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private IEnumerator CompareCards()
     {
         inputActions.GameInput.Disable();
-        yield return new WaitForSeconds(1.5f);
         if (card1.pair == card2.pair)
         {
             ///correct pair
             print("correct");
+            yield return new WaitForSeconds(1f);
             card1.gameObject.SetActive(false);
             card2.gameObject.SetActive(false);
+            //large card image & wait
             cardPairsLeft--;
             if (cardPairsLeft <= 0)
             {
@@ -151,6 +156,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         }
         else
         {
+            yield return new WaitForSeconds(1.5f);
             ///wrong pair
             print("wrong");
             card1.Turn();
@@ -194,10 +200,13 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private void LayoutCards()
     {
         Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
-        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x*2 - 2 * cardMargin, screenSizeWorld.y*2 - 2 * cardMargin);
+        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - 2 * cardMargin, screenSizeWorld.y * 2 - 2 * cardMargin);
 
         Vector2 cardSize = cards[0].GetComponent<SpriteRenderer>().sprite.bounds.size;
-        cardSizeScaled = ScaleCards(cardSize, effectiveSpace);
+        cardSizeScaled = cardSize;
+        print(cardSize);
+        cardSizeScaled = DetermineCardSize(cardSize, effectiveSpace);
+        print(cardSizeScaled);
         Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
 
         float leftRightMargin = screenSizeWorld.x * 2 - amountCardsX * (cardSizeScaled.x + cardMargin) + cardMargin * 2;
@@ -222,36 +231,46 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         }
     }
 
-    private Vector2 ScaleCards(Vector2 cardSize, Vector2 effectiveSpace)
+    private Vector2 DetermineCardSize(Vector2 cardSize, Vector2 effectiveSpace)
     {
+        float cardAspectRatio = cardSize.x / cardSize.y;
+        print(cardAspectRatio);
         amountCards = cards.Length;
         amountCardsX = Mathf.FloorToInt(effectiveSpace.x / (cardSize.x + cardMargin));
         amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
         int stop = 0;
 
-        while ((effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) > cardSizeScaled.y + cardMargin || 
-               effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) < 0) && stop < 500)
+        while ((effectiveSpace.y - TotalCardHeight() > cardSizeScaled.y + cardMargin || 
+               effectiveSpace.y - TotalCardHeight() < 0) && stop < 500)
         {
-            if (amountCardsY * (cardSizeScaled.y + cardMargin) > effectiveSpace.y)
+            if (TotalCardHeight() > effectiveSpace.y)
             {
                 ///cards too large
                 amountCardsX++;
+                print("too large");
             }
-            else if (effectiveSpace.y - amountCardsY * (cardSizeScaled.y + cardMargin) > cardSizeScaled.y + cardMargin)
+            else if (effectiveSpace.y - TotalCardHeight() > cardSizeScaled.y + cardMargin)
             {
                 ///cards too small
                 amountCardsX--;
+                print("too small");
             }
             amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
             float size = effectiveSpace.x / amountCardsX - cardMargin;
-            cardSizeScaled = new Vector2(size, size);
+            cardSizeScaled = new Vector2(size, size / cardAspectRatio);
             stop++;
+
+            if (stop == 500)
+                Debug.LogWarning("Hit the resize limit");
         }
 
         ///correct size, remove margins for actual card only size
-        cardSizeScaled = new Vector2(cardSizeScaled.x - cardMargin, cardSizeScaled.y - cardMargin);
+        //cardSizeScaled = new Vector2(cardSizeScaled.x - cardMargin, cardSizeScaled.y - cardMargin);
         return cardSizeScaled;
     }
 
-
+    private float TotalCardHeight()
+    {
+        return amountCardsY * (cardSizeScaled.y + cardMargin);
+    }
 }

@@ -15,6 +15,7 @@ public class Card : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = cardback;
+        GetComponent<BoxCollider2D>().size = spriteRenderer.bounds.size;
     }
 
     public void Turn()
