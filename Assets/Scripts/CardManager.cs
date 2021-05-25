@@ -202,7 +202,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
         Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - 2 * cardMargin, screenSizeWorld.y * 2 - 2 * cardMargin);
 
-        Vector2 cardSize = cards[0].GetComponent<SpriteRenderer>().sprite.bounds.size;
+        Vector2 cardSize = cards[0].GetComponent<BoxCollider2D>().size;
+         
         cardSizeScaled = cardSize;
         print(cardSize);
         cardSizeScaled = DetermineCardSize(cardSize, effectiveSpace);
@@ -220,7 +221,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         {
             for (int j = 0; j < amountCardsX; j++)
             {
-                if (cardCounter > cards.Length - 1)
+                if (cardCounter > cards.Length)
                     return;
                 ScaleCard(cards[cardCounter].GetComponent<Card>());
                 cards[cardCounter].transform.position = nextCardPos;
@@ -229,48 +230,34 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             }
             nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
         }
+
+
     }
 
-    private Vector2 DetermineCardSize(Vector2 cardSize, Vector2 effectiveSpace)
+    private Vector2 DetermineCardSize(Vector2 originalCardSize, Vector2 effectiveSpace)
     {
-        float cardAspectRatio = cardSize.x / cardSize.y;
-        print(cardAspectRatio);
-        amountCards = cards.Length;
-        amountCardsX = Mathf.FloorToInt(effectiveSpace.x / (cardSize.x + cardMargin));
-        amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
-        int stop = 0;
+        float effectiveSpaceArea = effectiveSpace.x * effectiveSpace.y;
+        float cardSlot = effectiveSpaceArea / cards.Length;
+        float cardSlotWidth = Mathf.Sqrt(cardSlot * (effectiveSpace.x / effectiveSpace.y));
+        float cardSlotHeight = effectiveSpace.y / effectiveSpace.x * cardSlotWidth;
+        Vector2 cardSlotArea = new Vector2(cardSlotWidth, cardSlotHeight);
 
-        while ((effectiveSpace.y - TotalCardHeight() > cardSizeScaled.y + cardMargin || 
-               effectiveSpace.y - TotalCardHeight() < 0) && stop < 500)
+        float cardSize;
+        if (originalCardSize.x > originalCardSize.y)
         {
-            if (TotalCardHeight() > effectiveSpace.y)
-            {
-                ///cards too large
-                amountCardsX++;
-                print("too large");
-            }
-            else if (effectiveSpace.y - TotalCardHeight() > cardSizeScaled.y + cardMargin)
-            {
-                ///cards too small
-                amountCardsX--;
-                print("too small");
-            }
-            amountCardsY = Mathf.CeilToInt(amountCards / amountCardsX);
-            float size = effectiveSpace.x / amountCardsX - cardMargin;
-            cardSizeScaled = new Vector2(size, size / cardAspectRatio);
-            stop++;
-
-            if (stop == 500)
-                Debug.LogWarning("Hit the resize limit");
+            cardSize = cardSlotArea.x - cardMargin;
+            print("wide boy");
         }
+        else
+        {
+            cardSize = cardSlotArea.y - cardMargin;
+            print("tall boy");
+        }
+        cardSizeScaled = new Vector2(cardSize, cardSize);
 
-        ///correct size, remove margins for actual card only size
-        //cardSizeScaled = new Vector2(cardSizeScaled.x - cardMargin, cardSizeScaled.y - cardMargin);
+        amountCardsX = Mathf.Clamp(Mathf.FloorToInt(effectiveSpace.x / (cardSizeScaled.x + cardMargin)), 1, cards.Length);   //wrong
+        amountCardsY = Mathf.Clamp(Mathf.CeilToInt(cards.Length / amountCardsX), 1, cards.Length);
+        print(cardSlotArea + " ," +amountCardsX + " ," + amountCardsY);
         return cardSizeScaled;
-    }
-
-    private float TotalCardHeight()
-    {
-        return amountCardsY * (cardSizeScaled.y + cardMargin);
     }
 }

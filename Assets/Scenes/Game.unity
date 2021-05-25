@@ -194,6 +194,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2f3e392c6a7693c4bac68f9102c6101e, type: 3}
   - {fileID: 21300000, guid: c5b8e4ec02bc1384798d6af798aee0f4, type: 3}
   - {fileID: 21300000, guid: abb14fbf5a0c04d4cb0e58ea06a44168, type: 3}
+  - {fileID: 21300000, guid: 6930c90ff14f3014f8cd2545d734e254, type: 3}
   - {fileID: 21300000, guid: 2de34303b9a39e6478bd34ba9772de3c, type: 3}
   - {fileID: 21300000, guid: 2ebde4809737fe04b992f45ba4f5797c, type: 3}
   - {fileID: 21300000, guid: 441d4b309d258d44fb921dcdaa18b95d, type: 3}
@@ -201,7 +202,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1bf4567fb19c075449394b295940d6b9, type: 3}
   - {fileID: 21300000, guid: a7424d25a9dad0a408417c1b9dd426bc, type: 3}
   - {fileID: 21300000, guid: 5cc6e0a8da62fc5459b7df7e6943d3f2, type: 3}
-  - {fileID: 21300000, guid: 717482d61d67eed40a0a537c2b38ed11, type: 3}
   cardPrefab: {fileID: 3313332360476557185, guid: 4bdd6b91c03b0974ba44d125bd65cfcc, type: 3}
 --- !u!4 &124769557
 Transform:
