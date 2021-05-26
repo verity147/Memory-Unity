@@ -152,39 +152,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c1ae1f93ab9aa74e90e0bdabc09b1a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cards:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  cardMargin: 0.3
+  hoverScaling: {x: 0.1, y: 0.1, z: 0}
   cardpictures:
   - {fileID: 21300000, guid: 97576d8bf55caac47bf7caa9e938b5fc, type: 3}
   - {fileID: 21300000, guid: f040d9dd97b59724bb7a8327f9831b8d, type: 3}

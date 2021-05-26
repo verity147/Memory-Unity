@@ -6,16 +6,24 @@ using UnityEngine.InputSystem;
 
 public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
 {
-    private GameActionMap inputActions;
+    /// <summary>
+    /// The card sizing logic only works with sprites that have pixels per unit 1:1 with their resolution
+    /// </summary>
 
+
+    [Tooltip("The margin between cards")]
+    public float cardMargin = .3f;    ///margin between cards
+    [Tooltip("How much larger cards get while hovering over them")]
+    public Vector3 hoverScaling = new Vector3(0.1f, 0.1f, 0f);    ///added to card size when hovering
+    public Sprite[] cardpictures;
+    public GameObject cardPrefab;
+
+    private GameActionMap inputActions;
     private Camera mainCamera;
+    private GameObject[] cards;
     private int cameraHeight;
     private int cameraWidth;
-    private readonly float cardMargin = .3f;    ///margin between cards
-    private readonly Vector3 hoverScaling = new Vector3(0.1f, 0.1f, 0f);    ///added to card size when hovering
     private Vector2 cardSizeScaled;
-    private int amountCardsX;
-    private int amountCardsY;
     private int turnedCards = 0;
     private Card card1;
     private Card card2;
@@ -23,15 +31,6 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Card lastCard;
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
-    private int amountCards;
-
-    public GameObject[] cards;
-    public Sprite[] cardpictures;
-    public GameObject cardPrefab;
-
-    /// <summary>
-    /// The card sizing logic only works with sprites that have pixels per unit 1:1 with their resolution
-    /// </summary>
 
     private void OnEnable()
     {
@@ -200,64 +199,77 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private void LayoutCards()
     {
         Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
-        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - 2 * cardMargin, screenSizeWorld.y * 2 - 2 * cardMargin);
+        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - 1, screenSizeWorld.y * 2 - 1);
 
-        Vector2 cardSize = cards[0].GetComponent<BoxCollider2D>().size;
-         
-        cardSizeScaled = cardSize;
-        print(cardSize);
-        cardSizeScaled = DetermineCardSize(cardSize, effectiveSpace);
-        print(cardSizeScaled);
+        cardSizeScaled = DetermineCardSize(effectiveSpace);
+
+        //scale cards first, then determine col and row for if(wider than tall)
+
+        for (int i = 0; i < cards.Length; i++)
+        {
+            ScaleCard(cards[i].GetComponent<Card>());
+        }
+        float cardSpriteWidth = cards[0].GetComponent<SpriteRenderer>().bounds.size.x;
+
+        float colNumRaw = effectiveSpace.x / (cardSpriteWidth + cardMargin);
+        int cardColumns = Mathf.Clamp(Mathf.FloorToInt(colNumRaw), 1, cards.Length);
+        float rowNumRaw = (float)cards.Length / cardColumns;
+        int cardRows = Mathf.Clamp(Mathf.CeilToInt(rowNumRaw), 1, cards.Length);
+
         Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
+        float leftRightMargin;
+        float topBotMargin;
+        if (CardsWiderThanTall())
+        {
+            leftRightMargin = screenSizeWorld.x * 2 - cardColumns * (cardSizeScaled.x + cardMargin) + cardMargin * 2;
+            topBotMargin = screenSizeWorld.y * 2 - cardRows * (cardSizeScaled.y + cardMargin) + cardMargin * 2;
+        }
+        else
+        {
+            leftRightMargin = Mathf.Abs(cardColumns * (cards[0].transform.localScale.x - (cardSpriteWidth + cardMargin)));
+            topBotMargin = screenSizeWorld.y * 2 - cardRows * (cardSizeScaled.y + cardMargin) + cardMargin * 2;
+        }
 
-        float leftRightMargin = screenSizeWorld.x * 2 - amountCardsX * (cardSizeScaled.x + cardMargin) + cardMargin * 2;
-        float topBotMargin = screenSizeWorld.y * 2 - amountCardsY * (cardSizeScaled.y + cardMargin) + cardMargin * 2;
-
-        cardStartPos += new Vector2(cardSizeScaled.x / 2 + leftRightMargin / 2, -(cardSizeScaled.y / 2 + topBotMargin / 2));
+        cardStartPos += new Vector2(leftRightMargin / 2, -(cardSizeScaled.y / 2 + topBotMargin / 2));
         Vector2 nextCardPos = cardStartPos;
 
         int cardCounter = 0;
-        for (int i = 0; i < amountCardsY; i++)
+        for (int i = 0; i < cardRows; i++)
         {
-            for (int j = 0; j < amountCardsX; j++)
+            for (int j = 0; j < cardColumns; j++)
             {
-                if (cardCounter > cards.Length)
+                if (cardCounter >= cards.Length)
                     return;
-                ScaleCard(cards[cardCounter].GetComponent<Card>());
                 cards[cardCounter].transform.position = nextCardPos;
-                nextCardPos += new Vector2(cardSizeScaled.x + cardMargin, 0f);
+                nextCardPos += new Vector2(cardSpriteWidth + cardMargin, 0f);
                 cardCounter++;
             }
             nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
         }
-
-
     }
 
-    private Vector2 DetermineCardSize(Vector2 originalCardSize, Vector2 effectiveSpace)
+    private Vector2 DetermineCardSize(Vector2 effectiveSpace)
     {
         float effectiveSpaceArea = effectiveSpace.x * effectiveSpace.y;
-        float cardSlot = effectiveSpaceArea / cards.Length;
-        float cardSlotWidth = Mathf.Sqrt(cardSlot * (effectiveSpace.x / effectiveSpace.y));
-        float cardSlotHeight = effectiveSpace.y / effectiveSpace.x * cardSlotWidth;
-        Vector2 cardSlotArea = new Vector2(cardSlotWidth, cardSlotHeight);
-
+        float ratio = effectiveSpace.x / effectiveSpace.y;  //can only do landscape format 
+        float cardSlotArea = effectiveSpaceArea / cards.Length;
+        float cardSlotWidth = Mathf.Sqrt(cardSlotArea * ratio);
+        float cardSlotHeight = cardSlotArea / cardSlotWidth;
         float cardSize;
-        if (originalCardSize.x > originalCardSize.y)
+        if (CardsWiderThanTall())
         {
-            cardSize = cardSlotArea.x - cardMargin;
-            print("wide boy");
+            cardSize = cardSlotWidth - cardMargin;
         }
         else
         {
-            cardSize = cardSlotArea.y - cardMargin;
-            print("tall boy");
+            cardSize = cardSlotHeight - cardMargin;
         }
         cardSizeScaled = new Vector2(cardSize, cardSize);
-
-        amountCardsX = Mathf.Clamp(Mathf.FloorToInt(effectiveSpace.x / (cardSizeScaled.x + cardMargin)), 1, cards.Length);   //wrong
-        amountCardsY = Mathf.Clamp(Mathf.CeilToInt(cards.Length / amountCardsX), 1, cards.Length);
-        print(cardSlotArea + " ," +amountCardsX + " ," + amountCardsY);
         return cardSizeScaled;
+    }
+
+    private bool CardsWiderThanTall()
+    {
+        return cards[0].GetComponent<BoxCollider2D>().size.x > cards[0].GetComponent<BoxCollider2D>().size.y;
     }
 }
