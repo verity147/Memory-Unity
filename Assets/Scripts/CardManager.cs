@@ -13,6 +13,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
 
     [Tooltip("The margin between cards")]
     public float cardMargin = .3f;    ///margin between cards
+    [Tooltip("Minimum margin on screen border")]
+    public float screenBorderMargin = 1f;
     [Tooltip("How much larger cards get while hovering over them")]
     public Vector3 hoverScaling = new Vector3(0.1f, 0.1f, 0f);    ///added to card size when hovering
     public Sprite[] cardpictures;
@@ -31,6 +33,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Card lastCard;
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
+    public float menuSpace = 2f;
 
     private void OnEnable()
     {
@@ -60,7 +63,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     {
         InstantiateCards();
         Shuffle();
-        LayoutCards();
+        StartCoroutine(LayoutCards());
     }
 
     public void OnTurnCard(InputAction.CallbackContext context)
@@ -173,8 +176,9 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         {
             for (int j = 0; j < 2; j++)
             {
-                GameObject cardObject = Instantiate(cardPrefab);
+                GameObject cardObject = Instantiate(cardPrefab, new Vector3(0f, 0f, -20f), Quaternion.identity);
                 Card card = cardObject.GetComponent<Card>();
+                card.GetComponent<SpriteRenderer>().color = Color.clear;
                 card.face = cardpictures[i];
                 card.pair = i;
                 card.pairNumber = j;
@@ -196,55 +200,61 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         }
     }
 
-    private void LayoutCards()
+    private IEnumerator LayoutCards()
     {
         Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
-        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - 1, screenSizeWorld.y * 2 - 1);
+        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - screenBorderMargin * 2, screenSizeWorld.y * 2 - (screenBorderMargin * 2));
 
         cardSizeScaled = DetermineCardSize(effectiveSpace);
-
-        //scale cards first, then determine col and row for if(wider than tall)
 
         for (int i = 0; i < cards.Length; i++)
         {
             ScaleCard(cards[i].GetComponent<Card>());
         }
-        float cardSpriteWidth = cards[0].GetComponent<SpriteRenderer>().bounds.size.x;
+        Vector2 cardSpriteSize = cards[0].GetComponent<SpriteRenderer>().bounds.size;
 
-        float colNumRaw = effectiveSpace.x / (cardSpriteWidth + cardMargin);
-        int cardColumns = Mathf.Clamp(Mathf.FloorToInt(colNumRaw), 1, cards.Length);
-        float rowNumRaw = (float)cards.Length / cardColumns;
-        int cardRows = Mathf.Clamp(Mathf.CeilToInt(rowNumRaw), 1, cards.Length);
+        float colNumRaw = effectiveSpace.x / (cardSpriteSize.x + cardMargin);
+        int columns = Mathf.Clamp(Mathf.FloorToInt(colNumRaw), 1, cards.Length);
+        float rowNumRaw = (float)cards.Length / columns;
+        int rows = Mathf.Clamp(Mathf.CeilToInt(rowNumRaw), 1, cards.Length);
+
+        if (Mathf.FloorToInt(effectiveSpace.y / (cardSpriteSize.y + cardMargin)) > rows)
+        {
+            print("more rows possible");
+            rows = Mathf.FloorToInt(effectiveSpace.y / (cardSpriteSize.y + cardMargin));
+            columns = Mathf.CeilToInt((float)cards.Length / rows);
+        }
 
         Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
-        float leftRightMargin;
-        float topBotMargin;
-        if (CardsWiderThanTall())
-        {
-            leftRightMargin = screenSizeWorld.x * 2 - cardColumns * (cardSizeScaled.x + cardMargin) + cardMargin * 2;
-            topBotMargin = screenSizeWorld.y * 2 - cardRows * (cardSizeScaled.y + cardMargin) + cardMargin * 2;
-        }
-        else
-        {
-            leftRightMargin = Mathf.Abs(cardColumns * (cards[0].transform.localScale.x - (cardSpriteWidth + cardMargin)));
-            topBotMargin = screenSizeWorld.y * 2 - cardRows * (cardSizeScaled.y + cardMargin) + cardMargin * 2;
-        }
-
-        cardStartPos += new Vector2(leftRightMargin / 2, -(cardSizeScaled.y / 2 + topBotMargin / 2));
+        float totalCardWidth = columns * (cardSpriteSize.x + cardMargin);
+        float leftRightMargin = effectiveSpace.x - totalCardWidth;
+        float topBotMargin = effectiveSpace.y - (rows * (cardSpriteSize.y + cardMargin));
+        cardStartPos += new Vector2((cardSpriteSize.x + cardMargin + leftRightMargin) / 2 + screenBorderMargin,
+                                    -((cardSpriteSize.y + cardMargin + topBotMargin) / 2 + screenBorderMargin + menuSpace));
         Vector2 nextCardPos = cardStartPos;
-
+        float lerp = .2f;
+        float timeElapsed = 0f;
         int cardCounter = 0;
-        for (int i = 0; i < cardRows; i++)
+        for (int i = 0; i < rows; i++)
         {
-            for (int j = 0; j < cardColumns; j++)
+            for (int j = 0; j < columns; j++)
             {
                 if (cardCounter >= cards.Length)
-                    return;
+                    yield break;
                 cards[cardCounter].transform.position = nextCardPos;
-                nextCardPos += new Vector2(cardSpriteWidth + cardMargin, 0f);
+                while (timeElapsed<lerp)
+                {
+                    float t = (timeElapsed / lerp) * (timeElapsed / lerp);
+                    cards[cardCounter].GetComponent<SpriteRenderer>().color = Color.Lerp(Color.clear, Color.white, t);
+                    timeElapsed += Time.deltaTime;
+                    yield return null;
+                }
+                cards[cardCounter].GetComponent<SpriteRenderer>().color = Color.white;  ///ensure the sprite never stays slightly transparent
+                timeElapsed = 0f;
+                nextCardPos += new Vector2(cardSpriteSize.x + cardMargin, 0f);
                 cardCounter++;
             }
-            nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSizeScaled.y + cardMargin));
+            nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSpriteSize.y + cardMargin));
         }
     }
 
