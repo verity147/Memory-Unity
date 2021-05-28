@@ -15,8 +15,14 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     public float cardMargin = .3f;    ///margin between cards
     [Tooltip("Minimum margin on screen border")]
     public float screenBorderMargin = 1f;
+    public float menuSpace = 2f;
     [Tooltip("How much larger cards get while hovering over them")]
     public Vector3 hoverScaling = new Vector3(0.1f, 0.1f, 0f);    ///added to card size when hovering
+    [Tooltip("Minimum number of card columns")]
+    public int minColumns = 4;
+    public int minRows = 4;
+    [Tooltip("How long the cards fade in")]
+    public float fadeIn = .2f;
     public Sprite[] cardpictures;
     public GameObject cardPrefab;
 
@@ -33,7 +39,6 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Card lastCard;
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
-    public float menuSpace = 2f;
 
     private void OnEnable()
     {
@@ -203,36 +208,44 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private IEnumerator LayoutCards()
     {
         Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
-        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - screenBorderMargin * 2, screenSizeWorld.y * 2 - (screenBorderMargin * 2));
+        Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - screenBorderMargin * 2, screenSizeWorld.y * 2 - screenBorderMargin * 2 - menuSpace);
 
         cardSizeScaled = DetermineCardSize(effectiveSpace);
-
         for (int i = 0; i < cards.Length; i++)
         {
             ScaleCard(cards[i].GetComponent<Card>());
         }
         Vector2 cardSpriteSize = cards[0].GetComponent<SpriteRenderer>().bounds.size;
 
-        float colNumRaw = effectiveSpace.x / (cardSpriteSize.x + cardMargin);
-        int columns = Mathf.Clamp(Mathf.FloorToInt(colNumRaw), 1, cards.Length);
-        float rowNumRaw = (float)cards.Length / columns;
-        int rows = Mathf.Clamp(Mathf.CeilToInt(rowNumRaw), 1, cards.Length);
-
-        if (Mathf.FloorToInt(effectiveSpace.y / (cardSpriteSize.y + cardMargin)) > rows)
+        int columns = Mathf.Clamp(Mathf.FloorToInt(effectiveSpace.x / (cardSpriteSize.x + cardMargin)), 1, cards.Length);
+        int rows = Mathf.Clamp(Mathf.FloorToInt(effectiveSpace.y / (cardSpriteSize.y + cardMargin)), 1, cards.Length);
+        if (cameraWidth / cameraHeight >= 1f)
         {
-            print("more rows possible");
-            rows = Mathf.FloorToInt(effectiveSpace.y / (cardSpriteSize.y + cardMargin));
-            columns = Mathf.CeilToInt((float)cards.Length / rows);
+            rows = Mathf.Clamp(Mathf.CeilToInt((float)cards.Length / columns), 1, cards.Length);
+            if (rows < minRows && minRows * (cardSpriteSize.y + cardMargin) < effectiveSpace.y)
+            {
+                rows = minRows;
+                columns = cards.Length / rows;
+            }
+        }
+        else
+        {
+            columns = Mathf.Clamp(Mathf.CeilToInt((float)cards.Length / rows), 1, cards.Length);
+            if (columns < minColumns && minColumns * (cardSpriteSize.x + cardMargin) < effectiveSpace.x)
+            {
+                columns = minColumns;
+                rows = cards.Length / columns;
+            }
         }
 
-        Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
         float totalCardWidth = columns * (cardSpriteSize.x + cardMargin);
         float leftRightMargin = effectiveSpace.x - totalCardWidth;
         float topBotMargin = effectiveSpace.y - (rows * (cardSpriteSize.y + cardMargin));
+        Vector2 cardStartPos = mainCamera.ScreenToWorldPoint(new Vector3(0, cameraHeight));
         cardStartPos += new Vector2((cardSpriteSize.x + cardMargin + leftRightMargin) / 2 + screenBorderMargin,
                                     -((cardSpriteSize.y + cardMargin + topBotMargin) / 2 + screenBorderMargin + menuSpace));
         Vector2 nextCardPos = cardStartPos;
-        float lerp = .2f;
+
         float timeElapsed = 0f;
         int cardCounter = 0;
         for (int i = 0; i < rows; i++)
@@ -242,9 +255,9 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
                 if (cardCounter >= cards.Length)
                     yield break;
                 cards[cardCounter].transform.position = nextCardPos;
-                while (timeElapsed<lerp)
+                while (timeElapsed<fadeIn)
                 {
-                    float t = (timeElapsed / lerp) * (timeElapsed / lerp);
+                    float t = (timeElapsed / fadeIn) * (timeElapsed / fadeIn);
                     cards[cardCounter].GetComponent<SpriteRenderer>().color = Color.Lerp(Color.clear, Color.white, t);
                     timeElapsed += Time.deltaTime;
                     yield return null;
@@ -261,9 +274,16 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Vector2 DetermineCardSize(Vector2 effectiveSpace)
     {
         float effectiveSpaceArea = effectiveSpace.x * effectiveSpace.y;
-        float ratio = effectiveSpace.x / effectiveSpace.y;  //can only do landscape format 
         float cardSlotArea = effectiveSpaceArea / cards.Length;
-        float cardSlotWidth = Mathf.Sqrt(cardSlotArea * ratio);
+        float cardSlotWidth;
+        if (cameraWidth / cameraHeight >= 1f)   ///switch for landscape vs portrait screen
+        {
+            cardSlotWidth = Mathf.Sqrt(cardSlotArea * effectiveSpace.x / effectiveSpace.y);
+        }
+        else
+        {
+            cardSlotWidth = Mathf.Sqrt(cardSlotArea * (effectiveSpace.y / effectiveSpace.x));
+        }
         float cardSlotHeight = cardSlotArea / cardSlotWidth;
         float cardSize;
         if (CardsWiderThanTall())
