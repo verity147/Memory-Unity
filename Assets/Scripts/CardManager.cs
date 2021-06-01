@@ -182,6 +182,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             for (int j = 0; j < 2; j++)
             {
                 GameObject cardObject = Instantiate(cardPrefab, new Vector3(0f, 0f, -20f), Quaternion.identity);
+                cardObject.layer = 6;
                 Card card = cardObject.GetComponent<Card>();
                 card.GetComponent<SpriteRenderer>().color = Color.clear;
                 card.face = cardpictures[i];
