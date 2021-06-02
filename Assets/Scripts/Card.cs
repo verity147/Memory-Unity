@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class Card : MonoBehaviour
     public int pairNumber;  //identifies each card within a pair
     public Sprite cardback;
     public Sprite face;
+    public int spriteNumber;
 
     private SpriteRenderer spriteRenderer;
 
@@ -16,6 +18,13 @@ public class Card : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = cardback;
         GetComponent<BoxCollider2D>().size = spriteRenderer.bounds.size;
+    }
+
+    private void Start()
+    {
+        bool findNum = int.TryParse(face.name.Substring(4, 2), out spriteNumber);
+        if (!findNum)
+            Debug.LogError("Could not determine valid spriteNumber!");        
     }
 
     public void Turn()

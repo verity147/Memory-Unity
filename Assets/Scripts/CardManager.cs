@@ -24,7 +24,9 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     [Tooltip("How long the cards fade in")]
     public float fadeIn = .2f;
     public Sprite[] cardpictures;
+    public Sprite[] bigCardpictures;
     public GameObject cardPrefab;
+    public GameObject bigCard;
 
     private GameActionMap inputActions;
     private Camera mainCamera;
@@ -39,6 +41,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Card lastCard;
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
+    private int attempts = 0;
+    private GameHandler gameHandler;
 
     private void OnEnable()
     {
@@ -49,26 +53,54 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             // when actions get triggered.
             inputActions.GameInput.SetCallbacks(this);
         }
-        inputActions.GameInput.Enable();
     }
 
     private void OnDisable()
     {
-        inputActions.GameInput.Disable();
+        EnableGameInput(false);
     }
 
     private void Awake()
     {
         mainCamera = Camera.main;
+        gameHandler = FindObjectOfType<GameHandler>();
         cameraHeight = mainCamera.pixelHeight;
         cameraWidth = mainCamera.pixelWidth;
     }
 
     private void Start()
     {
+        cards = new GameObject[0];
+        ResetCards();
+    }
+
+    internal void ResetCards()
+    {
+        EnableGameInput(false);
+        if (cards.Length > 0)
+        {
+            foreach (var card in cards)
+            {
+                Destroy(card);
+            }
+            Array.Clear(cards, 0, cards.Length);
+        }        
         InstantiateCards();
         Shuffle();
         StartCoroutine(LayoutCards());
+        attempts = 0;
+    }
+
+    public void EnableGameInput(bool input)
+    {
+        if (input)
+        {
+            inputActions.GameInput.Enable();
+        }
+        else
+        {
+            inputActions.GameInput.Disable();
+        }
     }
 
     public void OnTurnCard(InputAction.CallbackContext context)
@@ -88,6 +120,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
                         card2 = currentCard;
                         StartCoroutine(CompareCards());
                         turnedCards = 0;
+                        attempts++;
+                        gameHandler.CountAttempt(attempts);
                         break;
                     default:
                         Debug.LogWarning("Something went wrong, we shouldn't be here when no card has been turned");
@@ -146,7 +180,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
 
     private IEnumerator CompareCards()
     {
-        inputActions.GameInput.Disable();
+        EnableGameInput(false);
         if (card1.pair == card2.pair)
         {
             ///correct pair
@@ -154,11 +188,15 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             yield return new WaitForSeconds(1f);
             card1.gameObject.SetActive(false);
             card2.gameObject.SetActive(false);
-            //large card image & wait
+            bigCard.GetComponent<SpriteRenderer>().sprite = bigCardpictures[card1.spriteNumber - 1];    ///sprite names count from 1, so -1 for correct index
+            bigCard.SetActive(true);    //lerp fade in and out over .5s?
+            yield return new WaitForSeconds(1.5f);
+            bigCard.SetActive(false);
             cardPairsLeft--;
             if (cardPairsLeft <= 0)
             {
-                ///end of game
+                //end of game
+                gameHandler.NewGame();
             }
         }
         else
@@ -169,7 +207,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             card1.Turn();
             card2.Turn();
         }
-        inputActions.GameInput.Enable();
+        EnableGameInput(true);
     }
 
     private void InstantiateCards()
@@ -270,6 +308,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             }
             nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSpriteSize.y + cardMargin));
         }
+        EnableGameInput(true);
     }
 
     private Vector2 DetermineCardSize(Vector2 effectiveSpace)
