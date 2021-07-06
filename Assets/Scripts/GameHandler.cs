@@ -3,15 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 using TMPro;
+
+public enum Sounds { correct, wrong }
 
 public class GameHandler : MonoBehaviour
 {
+    [Header ("User Interface")]
     public GameObject widescreenMenu;
     public GameObject portraitMenu;
     public GameObject widescreenMenuBar;
     public GameObject portraitMenuBar;
     public GameObject winScreen;
+    [Header ("Audio")]
+    public AudioSource audioSource;
+    public AudioMixer mixer;
+    public AudioClip correctSound;
+    public AudioClip wrongSound;
+
     private TMP_Text attemptsText;
 
     private PostProcessLayer processLayer;
@@ -74,7 +84,27 @@ public class GameHandler : MonoBehaviour
     {
         attemptsText.text = string.Format("{0} Versuche", attempts);
     }
-    
+
+    internal void PlaySound(Sounds sound)
+    {
+        switch (sound)
+        {
+            case Sounds.correct:
+                audioSource.PlayOneShot(correctSound);
+                break;
+            case Sounds.wrong:
+                audioSource.PlayOneShot(wrongSound);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void SetVolume(float sliderValue)
+    {
+        mixer.SetFloat("MasterVolume", Mathf.Log10(sliderValue) * 20);
+    }
+
     public void QuitGame()
     {
         Application.Quit();

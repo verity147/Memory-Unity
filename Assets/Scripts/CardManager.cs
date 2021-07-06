@@ -185,6 +185,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         {
             ///correct pair
             print("correct");
+            gameHandler.PlaySound(Sounds.correct);
             yield return new WaitForSeconds(1f);
             card1.gameObject.SetActive(false);
             card2.gameObject.SetActive(false);
@@ -202,6 +203,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         }
         else
         {
+            gameHandler.PlaySound(Sounds.wrong);
             yield return new WaitForSeconds(1.5f);
             ///wrong pair
             print("wrong");
