@@ -196,7 +196,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             if (cardPairsLeft <= 0)
             {
                 //end of game
-                gameHandler.NewGame();
+                //gameHandler.NewGame();
+                gameHandler.WinGame();
             }
         }
         else

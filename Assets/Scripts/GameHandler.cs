@@ -11,6 +11,7 @@ public class GameHandler : MonoBehaviour
     public GameObject portraitMenu;
     public GameObject widescreenMenuBar;
     public GameObject portraitMenuBar;
+    public GameObject winScreen;
     private TMP_Text attemptsText;
 
     private PostProcessLayer processLayer;
@@ -56,11 +57,17 @@ public class GameHandler : MonoBehaviour
         }
     }
 
-    public void NewGame()
+    public void NewGame(bool menu)
     {
         cardManager.ResetCards();
-        MenuToggle();
+        if(menu)
+            MenuToggle();
         CountAttempt(0);
+    }
+
+    public void WinGame()
+    {
+        winScreen.SetActive(true);
     }
 
     internal void CountAttempt(int attempts)

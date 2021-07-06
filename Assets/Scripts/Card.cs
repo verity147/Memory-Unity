@@ -29,7 +29,7 @@ public class Card : MonoBehaviour
 
     public void Turn()
     {
-        if (spriteRenderer.sprite == cardback)
+        if (spriteRenderer != null && spriteRenderer.sprite == cardback)
         {
             spriteRenderer.sprite = face;
             gameObject.GetComponent<Collider2D>().enabled = false;
