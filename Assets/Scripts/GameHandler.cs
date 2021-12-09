@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.Audio;
 using TMPro;
 
-public enum Sounds { correct, wrong }
+public enum Sounds { correct, wrong, win }
 
 public class GameHandler : MonoBehaviour
 {
@@ -19,8 +19,9 @@ public class GameHandler : MonoBehaviour
     [Header ("Audio")]
     public AudioSource audioSource;
     public AudioMixer mixer;
-    public AudioClip correctSound;
-    public AudioClip wrongSound;
+    [SerializeField] private AudioClip correctSound;
+    [SerializeField] private AudioClip wrongSound;
+    [SerializeField] private AudioClip winSound;
 
     private TMP_Text attemptsText;
 
@@ -94,6 +95,9 @@ public class GameHandler : MonoBehaviour
                 break;
             case Sounds.wrong:
                 audioSource.PlayOneShot(wrongSound);
+                break;
+            case Sounds.win:
+                audioSource.PlayOneShot(winSound);
                 break;
             default:
                 break;

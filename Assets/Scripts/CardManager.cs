@@ -196,9 +196,9 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             cardPairsLeft--;
             if (cardPairsLeft <= 0)
             {
-                //end of game
-                //gameHandler.NewGame();
                 gameHandler.WinGame();
+                yield return new WaitForSeconds(.5f);
+                gameHandler.PlaySound(Sounds.win);
             }
         }
         else
