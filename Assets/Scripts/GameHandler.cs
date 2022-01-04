@@ -17,7 +17,8 @@ public class GameHandler : MonoBehaviour
     public GameObject portraitMenuBar;
     public GameObject winScreen;
     [Header ("Audio")]
-    public AudioSource audioSource;
+    public AudioSource audioSourceMusic;
+    public AudioSource audioSourceEffects;
     public AudioMixer mixer;
     [SerializeField] private AudioClip correctSound;
     [SerializeField] private AudioClip wrongSound;
@@ -91,22 +92,27 @@ public class GameHandler : MonoBehaviour
         switch (sound)
         {
             case Sounds.correct:
-                audioSource.PlayOneShot(correctSound);
+                audioSourceEffects.PlayOneShot(correctSound);
                 break;
             case Sounds.wrong:
-                audioSource.PlayOneShot(wrongSound);
+                audioSourceEffects.PlayOneShot(wrongSound);
                 break;
             case Sounds.win:
-                audioSource.PlayOneShot(winSound);
+                audioSourceEffects.PlayOneShot(winSound);
                 break;
             default:
                 break;
         }
     }
 
-    public void SetVolume(float sliderValue)
+    public void SetMusicVolume(float sliderValue)
     {
-        mixer.SetFloat("MasterVolume", Mathf.Log10(sliderValue) * 20);
+        mixer.SetFloat("MusicVolume", Mathf.Log10(sliderValue) * 20);
+    }
+
+    public void SetEffectsVolume(float sliderValue)
+    {
+        mixer.SetFloat("EffectsVolume", Mathf.Log10(sliderValue) * 20);
     }
 
     public void QuitGame()
