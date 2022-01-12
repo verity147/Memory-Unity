@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.Audio;
 using TMPro;
 
-public enum Sounds { correct, wrong, win }
+public enum Sounds { correct, wrong, win, leaves, card }
 
 public class GameHandler : MonoBehaviour
 {
@@ -23,7 +23,10 @@ public class GameHandler : MonoBehaviour
     [SerializeField] private AudioClip correctSound;
     [SerializeField] private AudioClip wrongSound;
     [SerializeField] private AudioClip winSound;
+    [SerializeField] private AudioClip leavesSound;
+    [SerializeField] private AudioClip cardSound;
 
+    [SerializeField] private ParticleSystem leavesParticle;
     private TMP_Text attemptsText;
 
     private PostProcessLayer processLayer;
@@ -79,6 +82,10 @@ public class GameHandler : MonoBehaviour
 
     public void WinGame()
     {
+        PlaySound(Sounds.leaves);
+        if (leavesParticle.isPlaying)
+            leavesParticle.Stop();
+        leavesParticle.Play();
         winScreen.SetActive(true);
     }
 
@@ -99,6 +106,12 @@ public class GameHandler : MonoBehaviour
                 break;
             case Sounds.win:
                 audioSourceEffects.PlayOneShot(winSound);
+                break;
+            case Sounds.card:
+                audioSourceEffects.PlayOneShot(cardSound);
+                break;
+            case Sounds.leaves:
+                audioSourceEffects.PlayOneShot(leavesSound);
                 break;
             default:
                 break;

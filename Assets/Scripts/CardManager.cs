@@ -110,6 +110,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             if (FindCurrentCard())
             {
                 currentCard.Turn();
+                gameHandler.PlaySound(Sounds.card);
                 turnedCards++;
                 switch (turnedCards)
                 {
@@ -185,13 +186,18 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         {
             ///correct pair
             print("correct");
+            yield return new WaitForSeconds(.5f);
             gameHandler.PlaySound(Sounds.correct);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(.5f);
             card1.gameObject.SetActive(false);
             card2.gameObject.SetActive(false);
             bigCard.GetComponent<SpriteRenderer>().sprite = bigCardpictures[card1.spriteNumber - 1];    ///sprite names count from 1, so -1 for correct index
             bigCard.SetActive(true);    //lerp fade in and out over .5s?
             yield return new WaitForSeconds(1.5f);
+            Color CardColor = bigCard.GetComponent<SpriteRenderer>().color;
+            Color transparentColor = bigCard.GetComponent<SpriteRenderer>().color;
+            transparentColor.a = 0;
+            //Color.Lerp(CardColor, transparentColor, )
             bigCard.SetActive(false);
             cardPairsLeft--;
             if (cardPairsLeft <= 0)
@@ -203,8 +209,9 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         }
         else
         {
+            yield return new WaitForSeconds(.5f);
             gameHandler.PlaySound(Sounds.wrong);
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
             ///wrong pair
             print("wrong");
             card1.Turn();
