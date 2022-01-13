@@ -26,7 +26,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     public Sprite[] cardpictures;
     public Sprite[] bigCardpictures;
     public GameObject cardPrefab;
-    public GameObject bigCard;
+    public BigCard bigCard;
 
     private GameActionMap inputActions;
     private Camera mainCamera;
@@ -191,14 +191,14 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             yield return new WaitForSeconds(.5f);
             card1.gameObject.SetActive(false);
             card2.gameObject.SetActive(false);
-            bigCard.GetComponent<SpriteRenderer>().sprite = bigCardpictures[card1.spriteNumber - 1];    ///sprite names count from 1, so -1 for correct index
-            bigCard.SetActive(true);    //lerp fade in and out over .5s?
-            yield return new WaitForSeconds(1.5f);
-            Color CardColor = bigCard.GetComponent<SpriteRenderer>().color;
-            Color transparentColor = bigCard.GetComponent<SpriteRenderer>().color;
-            transparentColor.a = 0;
-            //Color.Lerp(CardColor, transparentColor, )
-            bigCard.SetActive(false);
+            bigCard.gameObject.GetComponent<SpriteRenderer>().sprite = bigCardpictures[card1.spriteNumber - 1];    ///sprite names count from 1, so -1 for correct index
+            bigCard.gameObject.SetActive(true);
+            bigCard.fade = true;
+            yield return new WaitForSeconds(1.2f);
+            bigCard.fade = true;
+            yield return new WaitForSeconds(0.3f);
+            bigCard.MakeTransparent();
+            bigCard.gameObject.SetActive(false);
             cardPairsLeft--;
             if (cardPairsLeft <= 0)
             {

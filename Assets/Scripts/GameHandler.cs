@@ -10,22 +10,17 @@ public enum Sounds { correct, wrong, win, leaves, card }
 
 public class GameHandler : MonoBehaviour
 {
+    private enum Menus { options = 0, winScreen = 1, cardInfo = 2, info = 3 }
     [Header ("User Interface")]
-    public GameObject widescreenMenu;
-    public GameObject portraitMenu;
     public GameObject widescreenMenuBar;
     public GameObject portraitMenuBar;
-    public GameObject winScreen;
+    [SerializeField] GameObject options, winScreen, cardInfo, info;
     [Header ("Audio")]
     public AudioSource audioSourceMusic;
     public AudioSource audioSourceEffects;
     public AudioMixer mixer;
-    [SerializeField] private AudioClip correctSound;
-    [SerializeField] private AudioClip wrongSound;
-    [SerializeField] private AudioClip winSound;
-    [SerializeField] private AudioClip leavesSound;
-    [SerializeField] private AudioClip cardSound;
-
+    [SerializeField] private AudioClip correctSound, wrongSound, winSound, leavesSound, cardSound;
+    [Header ("Effects")]
     [SerializeField] private ParticleSystem leavesParticle;
     private TMP_Text attemptsText;
 
@@ -34,6 +29,7 @@ public class GameHandler : MonoBehaviour
     private CardManager cardManager;
     private GameObject menu;
     private GameObject menuBar;
+    private int lastOpenMenu;
 
     private void Awake()
     {
@@ -45,26 +41,42 @@ public class GameHandler : MonoBehaviour
     {
         if(Screen.width > Screen.height)
         {
-            menu = widescreenMenu;
             menuBar = widescreenMenuBar;
         }
         else
         {
-            menu = portraitMenu;
             menuBar = portraitMenuBar;
         }
         menuBar.SetActive(true);
         attemptsText = menuBar.transform.Find("Attempts_T").GetComponent<TMP_Text>();
     }
 
-    public void MenuToggle()
+    public void MenuToggle(int menuChoice)
     {
         toggleMenu = !toggleMenu;
+        switch ((Menus)menuChoice)
+        {
+            case Menus.options:
+                menu = options;
+                break;
+            case Menus.winScreen:
+                menu = winScreen;
+                break;
+            case Menus.cardInfo:
+                menu = cardInfo;
+                break;
+            case Menus.info:
+                menu = info;
+                break;
+            default:
+                break;
+        }
         menu.SetActive(toggleMenu);
         processLayer.enabled = !processLayer.enabled;
         if (toggleMenu)
         {
             cardManager.EnableGameInput(false);
+            lastOpenMenu = menuChoice;
         }
         else
         {
@@ -75,8 +87,8 @@ public class GameHandler : MonoBehaviour
     public void NewGame(bool menu)
     {
         cardManager.ResetCards();
-        if(menu)
-            MenuToggle();
+        if(toggleMenu)
+            MenuToggle(lastOpenMenu);
         CountAttempt(0);
     }
 
@@ -86,7 +98,7 @@ public class GameHandler : MonoBehaviour
         if (leavesParticle.isPlaying)
             leavesParticle.Stop();
         leavesParticle.Play();
-        winScreen.SetActive(true);
+        MenuToggle(1);
     }
 
     internal void CountAttempt(int attempts)
