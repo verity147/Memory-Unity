@@ -8491,11 +8491,11 @@ RectTransform:
   m_Children:
   - {fileID: 1050018332}
   m_Father: {fileID: 1251152184}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 164}
+  m_AnchoredPosition: {x: 364, y: 288}
   m_SizeDelta: {x: 279.0744, y: 52.326416}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &550694184
@@ -8729,16 +8729,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 583309389}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1251152184}
-  m_RootOrder: 3
+  m_Father: {fileID: 1995579406}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -2}
+  m_AnchoredPosition: {x: -42.889435, y: -244.34958}
   m_SizeDelta: {x: 350.652, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &583309391
@@ -10813,11 +10813,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1251152184}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -104}
+  m_AnchoredPosition: {x: 364, y: 192.77}
   m_SizeDelta: {x: 484.1844, y: 103.3593}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &953228152
@@ -10875,7 +10875,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -11106,7 +11106,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -158.13351, y: -198}
+  m_AnchoredPosition: {x: 205.86, y: -495}
   m_SizeDelta: {x: 167.903, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1003170707
@@ -12546,7 +12546,6 @@ RectTransform:
   - {fileID: 1535401140}
   - {fileID: 1003170706}
   - {fileID: 1995579406}
-  - {fileID: 583309390}
   - {fileID: 953228151}
   - {fileID: 1861753974}
   - {fileID: 550694183}
@@ -13877,7 +13876,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -158.14, y: -149}
+  m_AnchoredPosition: {x: 205.86, y: -440}
   m_SizeDelta: {x: 167.91, y: 35}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1535401141
@@ -15543,11 +15542,11 @@ RectTransform:
   m_Children:
   - {fileID: 272159384}
   m_Father: {fileID: 1251152184}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 260}
+  m_AnchoredPosition: {x: 364, y: 377}
   m_SizeDelta: {x: 279.0744, y: 52.326416}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1861753975
@@ -16588,14 +16587,15 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 583309390}
   m_Father: {fileID: 1251152184}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 141}
-  m_SizeDelta: {x: 484.1844, y: 231.4671}
+  m_AnchoredPosition: {x: -364, y: 44.384}
+  m_SizeDelta: {x: 637.9633, y: 400.1279}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1995579407
 MonoBehaviour:
@@ -16617,9 +16617,15 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo '
+  m_text: "Dieses Ged\xE4chtnisspiel erg\xE4nzt das gleichnamige Buch von Elfi Sch\xF6niger
+    f\xFCr Kinder im Kindergarten- und Erstlesealter.\r\n\r\nDie Geschichte: Eine
+    Buchecker landet auf einer Waldlichtung. Nachdem sie sich im Boden verankert
+    hat, treibt sie Blattpaar um Blattpaar bis sie eine Jungbuche ist. Sie ist so
+    sehr mit ihrem Wachstum besch\xE4ftigt, dass sie die anderen B\xE4ume erst nach
+    langer Zeit wahrnimmt und kennenlernt. Sie unterh\xE4lt sich mit Herrn Fichte
+    und seinem Sohn sowie Frau Hainbuche. Viele Tiere besuchen sie. Dann wird es
+    Herbst und Winter und die kleine Buche ist pl\xF6tzlich nackt  \u2026\r\n\r\nDas
+    Waldm\xE4rchen \u201EBuche gr\xFCn & Buche rot\u201C ist erh\xE4ltlich bei\r\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9f0307a0b8d41eb4c8bd8f81dffb0523, type: 2}
   m_sharedMaterial: {fileID: 21333196981703990, guid: 9f0307a0b8d41eb4c8bd8f81dffb0523, type: 2}
@@ -16646,8 +16652,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.8
-  m_fontSizeBase: 19.8
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
