@@ -41,7 +41,6 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private Card lastCard;
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
-    private int attempts = 0;
     private GameHandler gameHandler;
 
     private void OnEnable()
@@ -88,7 +87,6 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
         InstantiateCards();
         Shuffle();
         StartCoroutine(LayoutCards());
-        attempts = 0;
     }
 
     public void EnableGameInput(bool input)
@@ -121,8 +119,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
                         card2 = currentCard;
                         StartCoroutine(CompareCards());
                         turnedCards = 0;
-                        attempts++;
-                        gameHandler.CountAttempt(attempts);
+                        gameHandler.attempts++;
+                        gameHandler.WriteAttempt();
                         break;
                     default:
                         Debug.LogWarning("Something went wrong, we shouldn't be here when no card has been turned");
@@ -191,20 +189,15 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             yield return new WaitForSeconds(.5f);
             card1.gameObject.SetActive(false);
             card2.gameObject.SetActive(false);
-            bigCard.gameObject.GetComponent<SpriteRenderer>().sprite = bigCardpictures[card1.spriteNumber - 1];    ///sprite names count from 1, so -1 for correct index
-            bigCard.gameObject.SetActive(true);
-            bigCard.fade = true;
-            yield return new WaitForSeconds(1.2f);
-            bigCard.fade = true;
-            yield return new WaitForSeconds(0.3f);
-            bigCard.MakeTransparent();
-            bigCard.gameObject.SetActive(false);
             cardPairsLeft--;
             if (cardPairsLeft <= 0)
             {
-                gameHandler.WinGame();
-                yield return new WaitForSeconds(.5f);
-                gameHandler.PlaySound(Sounds.win);
+                yield return ShowBigCard(1.5f);
+                StartCoroutine(gameHandler.WinGame());
+            }
+            else
+            {
+                yield return ShowBigCard(1.3f);
             }
         }
         else
@@ -218,6 +211,18 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             card2.Turn();
         }
         EnableGameInput(true);
+    }
+
+    private IEnumerator ShowBigCard(float duration)
+    {
+        bigCard.gameObject.GetComponent<SpriteRenderer>().sprite = bigCardpictures[card1.spriteNumber - 1];    ///sprite names count from 1, so -1 for correct index
+        bigCard.gameObject.SetActive(true);
+        bigCard.fade = true;
+        yield return new WaitForSeconds(duration);
+        bigCard.fade = true;
+        yield return new WaitForSeconds(0.3f);
+        bigCard.MakeTransparent();
+        bigCard.gameObject.SetActive(false);
     }
 
     private void InstantiateCards()

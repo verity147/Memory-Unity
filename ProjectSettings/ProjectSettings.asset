@@ -12,9 +12,9 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: Memory
-  defaultCursor: {fileID: 0}
+  companyName: VES Games
+  productName: "Buche gr\xFCn & Buche rot"
+  defaultCursor: {fileID: 2800000, guid: de5e612e123d5c44dbb54e693fd64a1c, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
   m_ShowUnitySplashScreen: 1
@@ -261,7 +261,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 42110d2d07f282f4ea75dea89b93cae2, type: 3}
+      m_Icon: {fileID: 2800000, guid: ca513d98e3a9f1848bead3d3bb295451, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0

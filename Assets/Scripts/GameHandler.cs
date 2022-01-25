@@ -14,6 +14,9 @@ public class GameHandler : MonoBehaviour
     [Header ("User Interface")]
     public GameObject widescreenMenuBar;
     public GameObject portraitMenuBar;
+    public GameObject winMenu;
+    public TMP_Text winText;
+    public string winMessage;
     [SerializeField] GameObject options, winScreen, cardInfo, info;
     [Header ("Audio")]
     public AudioSource audioSourceMusic;
@@ -30,6 +33,7 @@ public class GameHandler : MonoBehaviour
     private GameObject menu;
     private GameObject menuBar;
     private int lastOpenMenu;
+    internal int attempts = 0;
 
     private void Awake()
     {
@@ -39,6 +43,7 @@ public class GameHandler : MonoBehaviour
 
     private void Start()
     {
+        Cursor.visible = true;
         if(Screen.width > Screen.height)
         {
             menuBar = widescreenMenuBar;
@@ -51,57 +56,41 @@ public class GameHandler : MonoBehaviour
         attemptsText = menuBar.transform.Find("Attempts_T").GetComponent<TMP_Text>();
     }
 
-    public void MenuToggle(int menuChoice)
+    public void PauseGameInput(bool pauseInput)
     {
-        toggleMenu = !toggleMenu;
-        switch ((Menus)menuChoice)
-        {
-            case Menus.options:
-                menu = options;
-                break;
-            case Menus.winScreen:
-                menu = winScreen;
-                break;
-            case Menus.cardInfo:
-                menu = cardInfo;
-                break;
-            case Menus.info:
-                menu = info;
-                break;
-            default:
-                break;
-        }
-        menu.SetActive(toggleMenu);
-        processLayer.enabled = !processLayer.enabled;
-        if (toggleMenu)
-        {
-            cardManager.EnableGameInput(false);
-            lastOpenMenu = menuChoice;
-        }
-        else
-        {
-            cardManager.EnableGameInput(true);
-        }
+        cardManager.EnableGameInput(!pauseInput);
     }
 
-    public void NewGame(bool menu)
+    public void NewGame()
     {
         cardManager.ResetCards();
-        if(toggleMenu)
-            MenuToggle(lastOpenMenu);
-        CountAttempt(0);
+        attempts = 0;
+        WriteAttempt();
+        audioSourceMusic.Play();
     }
 
-    public void WinGame()
+    public IEnumerator WinGame()
     {
-        PlaySound(Sounds.leaves);
+        PauseGameInput(true);
+        float startvolume = audioSourceMusic.volume;
+        while (audioSourceMusic.volume > 0f)
+        {
+            audioSourceMusic.volume -= startvolume * Time.deltaTime / 0.5f;
+            yield return null;
+        }
+        audioSourceMusic.Stop();
+        audioSourceMusic.volume = startvolume;
         if (leavesParticle.isPlaying)
             leavesParticle.Stop();
+        PlaySound(Sounds.leaves);
         leavesParticle.Play();
-        MenuToggle(1);
+        yield return new WaitForSeconds(leavesParticle.main.duration * 2f);
+        PlaySound(Sounds.win);
+        winMenu.SetActive(true);
+        winText.text = string.Format(winMessage, attempts);
     }
 
-    internal void CountAttempt(int attempts)
+    internal void WriteAttempt()
     {
         attemptsText.text = string.Format("{0} Versuche", attempts);
     }

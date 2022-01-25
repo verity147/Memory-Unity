@@ -14,6 +14,7 @@ public class IntroManager : MonoBehaviour
     private void Start()
     {
         StartCoroutine(IntroTiming());
+        Cursor.visible = false;
     }
 
     private IEnumerator IntroTiming()
