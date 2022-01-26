@@ -28,11 +28,8 @@ public class GameHandler : MonoBehaviour
     private TMP_Text attemptsText;
 
     private PostProcessLayer processLayer;
-    private bool toggleMenu = false;
     private CardManager cardManager;
-    private GameObject menu;
     private GameObject menuBar;
-    private int lastOpenMenu;
     internal int attempts = 0;
 
     private void Awake()
@@ -56,11 +53,6 @@ public class GameHandler : MonoBehaviour
         attemptsText = menuBar.transform.Find("Attempts_T").GetComponent<TMP_Text>();
     }
 
-    public void PauseGameInput(bool pauseInput)
-    {
-        cardManager.EnableGameInput(!pauseInput);
-    }
-
     public void NewGame()
     {
         cardManager.ResetCards();
@@ -71,7 +63,6 @@ public class GameHandler : MonoBehaviour
 
     public IEnumerator WinGame()
     {
-        PauseGameInput(true);
         float startvolume = audioSourceMusic.volume;
         while (audioSourceMusic.volume > 0f)
         {

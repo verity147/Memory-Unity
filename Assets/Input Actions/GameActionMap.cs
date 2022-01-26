@@ -534,7 +534,7 @@ public class @GameActionMap : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""SelectCard"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Value"",
                     ""id"": ""65fca0b7-389a-456e-aed1-f6e6b4ba2130"",
                     ""expectedControlType"": """",
                     ""processors"": """",

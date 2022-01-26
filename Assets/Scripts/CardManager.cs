@@ -42,6 +42,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     private int cardPairsLeft = 0;
     private Vector3 currentPos;
     private GameHandler gameHandler;
+    private bool isAnyMenuOpen = false;
 
     private void OnEnable()
     {
@@ -75,7 +76,6 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
 
     internal void ResetCards()
     {
-        EnableGameInput(false);
         if (cards.Length > 0)
         {
             foreach (var card in cards)
@@ -83,10 +83,18 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
                 Destroy(card);
             }
             Array.Clear(cards, 0, cards.Length);
-        }        
+        }
+        lastCard = null;
+        currentCard = null;
         InstantiateCards();
         Shuffle();
         StartCoroutine(LayoutCards());
+    }
+
+    public void PauseGameInput(bool pauseInput) ///used by UI toggle buttons
+    {
+        EnableGameInput(!pauseInput);
+        isAnyMenuOpen = pauseInput;
     }
 
     public void EnableGameInput(bool input)
@@ -194,6 +202,7 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             {
                 yield return ShowBigCard(1.5f);
                 StartCoroutine(gameHandler.WinGame());
+                EnableGameInput(false);
             }
             else
             {
@@ -210,7 +219,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             card1.Turn();
             card2.Turn();
         }
-        EnableGameInput(true);
+        if(!isAnyMenuOpen)
+            EnableGameInput(true);
     }
 
     private IEnumerator ShowBigCard(float duration)
@@ -261,6 +271,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
 
     private IEnumerator LayoutCards()
     {
+        yield return new WaitForSeconds(0.1f);  ///need to wait for the menu to close after restarting, otherwise closing the menu enables input again
+        EnableGameInput(false);
         Vector2 screenSizeWorld = mainCamera.ScreenToWorldPoint(new Vector2(cameraWidth, cameraHeight));
         Vector2 effectiveSpace = new Vector2(screenSizeWorld.x * 2 - screenBorderMargin * 2, screenSizeWorld.y * 2 - screenBorderMargin * 2 - menuSpace);
 
@@ -323,7 +335,8 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
             }
             nextCardPos = new Vector2(cardStartPos.x, nextCardPos.y - (cardSpriteSize.y + cardMargin));
         }
-        EnableGameInput(true);
+        if(!isAnyMenuOpen)
+            EnableGameInput(true);
     }
 
     private Vector2 DetermineCardSize(Vector2 effectiveSpace)
@@ -357,4 +370,5 @@ public class CardManager : MonoBehaviour, GameActionMap.IGameInputActions
     {
         return cards[0].GetComponent<BoxCollider2D>().size.x > cards[0].GetComponent<BoxCollider2D>().size.y;
     }
+
 }
