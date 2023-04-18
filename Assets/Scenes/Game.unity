@@ -492,7 +492,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 433632827436928885, guid: 21728c2ebb7a9ec45b4e4f4f01a7e5c3, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 1cabdefa39c4dbe4a98e02b54228d8d0, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 684a93f709824614dabf3874dfb3b1a0, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
@@ -872,7 +872,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.924, g: 0.89295363, b: 0.87225604, a: 0.9019608}
+  m_Color: {r: 0.924, g: 0.89295363, b: 0.87225604, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1387,7 +1387,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.924, g: 0.89295363, b: 0.87225604, a: 0.9019608}
+  m_Color: {r: 0.924, g: 0.89295363, b: 0.87225604, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -11229,7 +11229,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.3
+  m_fontSize: 22.25
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -13074,7 +13074,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: https://edition-schoene-buecher.de/produkt-kategorie/kinderbuecher/
+          m_StringArgument: https://www.buche.elfi-schoeniger.de
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1202515311
@@ -13486,7 +13486,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.924, g: 0.89295363, b: 0.87225604, a: 0.9019608}
+  m_Color: {r: 0.924, g: 0.89295363, b: 0.87225604, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -14680,7 +14680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4190471, g: 0.766, b: 0.34244707, a: 1}
+  m_Color: {r: 0.6784314, g: 0.7294118, b: 0.25882354, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -17303,8 +17303,8 @@ MonoBehaviour:
     sehr mit ihrem Wachstum besch\xE4ftigt, dass sie die anderen B\xE4ume erst nach
     langer Zeit wahrnimmt und kennenlernt. Sie unterh\xE4lt sich mit Herrn Fichte
     und seinem Sohn sowie Frau Hainbuche. Viele Tiere besuchen sie. Dann wird es
-    Herbst und Winter und die kleine Buche ist pl\xF6tzlich nackt  \u2026\r\n\r\nDas
-    Waldm\xE4rchen \u201EBuche gr\xFCn & Buche rot\u201C ist erh\xE4ltlich bei\r"
+    Herbst und Winter und die kleine Buche ist pl\xF6tzlich nackt  \u2026\r\n\r\nMehr
+    Informationen zu Buch und Geschichte unter: "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9f0307a0b8d41eb4c8bd8f81dffb0523, type: 2}
   m_sharedMaterial: {fileID: 21333196981703990, guid: 9f0307a0b8d41eb4c8bd8f81dffb0523, type: 2}
